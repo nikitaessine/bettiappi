@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { supabaseServerClient } from "@/lib/supabaseClient";
 
+// Revalidate the home page every 10 seconds so new
+// bets created via links show up without redeploy.
+export const revalidate = 10;
+
 export default async function HomePage() {
   const supabase = supabaseServerClient();
 
