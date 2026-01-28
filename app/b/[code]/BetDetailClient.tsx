@@ -367,7 +367,7 @@ export default function BetDetailClient({
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              disabled={isSubmitting || bet.status === "RESOLVED"}
+              disabled={isSubmitting}
               onClick={() => handleLock(bet.status !== "LOCKED")}
               className="inline-flex items-center justify-center rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-60"
             >
