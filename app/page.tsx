@@ -1,6 +1,14 @@
 import Link from "next/link";
+import { supabaseServerClient } from "@/lib/supabaseClient";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = supabaseServerClient();
+
+  const { data: bets } = await supabase
+    .from("bets")
+    .select("code, title, stake_amount, currency, status, mode, created_at")
+    .order("created_at", { ascending: false });
+
   return (
     <div className="space-y-10">
       <section className="space-y-4">
@@ -49,6 +57,58 @@ export default function HomePage() {
             Create a bet, share a unique link, and let friends accept or
             decline from their own devices.
           </p>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">All bets</h2>
+          <span className="text-xs text-slate-400">
+            {bets?.length ?? 0} total
+          </span>
+        </div>
+        <div className="rounded-lg border border-slate-800 bg-slate-900/60 divide-y divide-slate-800 text-sm">
+          {!bets || bets.length === 0 ? (
+            <div className="px-4 py-3 text-slate-400 text-sm">
+              No bets yet. Be the first to{" "}
+              <Link href="/create" className="underline">
+                create a bet
+              </Link>
+              .
+            </div>
+          ) : (
+            bets.map((bet) => (
+              <Link
+                key={bet.code}
+                href={`/b/${bet.code}`}
+                className="flex items-center justify-between px-4 py-3 hover:bg-slate-800/70 transition-colors"
+              >
+                <div>
+                  <div className="font-medium">{bet.title}</div>
+                  <div className="mt-0.5 text-xs text-slate-400">
+                    Stake: {bet.stake_amount} {bet.currency} ·{" "}
+                    {new Date(bet.created_at as string).toLocaleString()}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1 text-xs">
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 font-medium ${
+                      bet.status === "OPEN"
+                        ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/40"
+                        : bet.status === "LOCKED"
+                        ? "bg-amber-500/10 text-amber-300 border border-amber-500/40"
+                        : "bg-sky-500/10 text-sky-300 border border-sky-500/40"
+                    }`}
+                  >
+                    {bet.status}
+                  </span>
+                  <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-wide text-slate-300">
+                    {bet.mode === "H2H" ? "Head-to-head" : "Multi"}
+                  </span>
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </section>
     </div>
